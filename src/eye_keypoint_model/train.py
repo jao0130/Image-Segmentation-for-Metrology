@@ -20,8 +20,8 @@ from pathlib import Path
 from ultralytics import YOLO
 
 # Default paths
-DEFAULT_DATASET = "data/animal_keypoints/dataset.yaml"
-DEFAULT_MODEL   = "yolov8n-pose.pt"   # nano; swap to yolov8s-pose.pt for better accuracy
+DEFAULT_DATASET = "data/ap10k_eye_keypoints/dataset.yaml"
+DEFAULT_MODEL   = "yolov8s-pose.pt"   # nano; swap to yolov8s-pose.pt for better accuracy
 DEFAULT_OUTPUT  = "runs/keypoint"
 DEFAULT_NAME    = "animal_eyes_v1"
 
@@ -29,7 +29,7 @@ DEFAULT_NAME    = "animal_eyes_v1"
 def train(
     dataset: str   = DEFAULT_DATASET,
     base_model: str = DEFAULT_MODEL,
-    epochs: int    = 100,
+    epochs: int    = 150,
     imgsz: int     = 640,
     batch: int     = 16,
     device: str    = "0",        # "0" = first GPU; "cpu" = CPU
@@ -63,8 +63,8 @@ def train(
         # ── Loss weights ──────────────────────────────────────────────────
         # pose  : keypoint regression loss weight (increase for better eye loc)
         # kobj  : keypoint objectness loss weight
-        pose=12.0,
-        kobj=2.0,
+        pose=6.0,
+        kobj=1.5,
 
         # ── Augmentation ──────────────────────────────────────────────────
         # Horizontal flip is fine for eyes (left/right are symmetric)

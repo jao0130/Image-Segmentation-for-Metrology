@@ -2,8 +2,13 @@ ultralytics>=8.0.0
 opencv-python>=4.8.0
 pandas>=2.0.0
 matplotlib>=3.7.0
+# Install PyTorch with CUDA 12.4 support (compatible with CUDA 12.6 driver):
+#   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+# CPU-only fallback (not recommended for training):
+#   pip install torch torchvision torchaudio
 torch>=2.0.0
 torchvision>=0.15.0
+torchaudio>=2.0.0
 python-dotenv>=1.0.0
 pytest>=7.4.0
 numpy>=1.24.0

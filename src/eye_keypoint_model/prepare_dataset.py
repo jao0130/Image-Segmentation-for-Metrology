@@ -39,7 +39,7 @@ MIN_EYE_VISIBILITY = 1
 
 def prepare_dataset(
     ap10k_dir: str = "data/ap10k",
-    output_dir: str = "data/animal_keypoints",
+    output_dir: str = "data/ap10k_eye_keypoints",
 ) -> str | None:
     """
     Convert AP-10K COCO-format annotations to YOLOv8 pose format.
@@ -158,6 +158,7 @@ val:   images/val
 
 # 2 keypoints: [left_eye, right_eye]
 kpt_shape: [2, 3]   # [num_keypoints, (x, y, visibility)]
+flip_idx: [1, 0]    # horizontal flip: left_eye <-> right_eye
 
 names:
   0: animal

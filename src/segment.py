@@ -12,7 +12,7 @@ def load_model(model_path: str = "yolov8n-seg.pt") -> YOLO:
     return YOLO(model_path)
 
 
-def segment_animals(model: YOLO, image_path: str, conf: float = 0.25) -> list:
+def segment_animals(model: YOLO, image_path: str, conf: float = 0.15) -> list:
     """
     Run YOLOv8-seg on image, return only animal detections.
 

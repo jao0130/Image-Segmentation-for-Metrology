@@ -1,25 +1,14 @@
 """
 Animal eye detection using a trained YOLOv8-pose model.
 
-Replaces the HoughCircles approach in src/eye_detect.py once a trained
-model is available at EYE_MODEL_PATH (set in .env).
-
 The trained model predicts two keypoints per animal detection:
   kp[0] = left_eye   (x, y, confidence)
   kp[1] = right_eye  (x, y, confidence)
 
-Integration with main.py
-------------------------
-In main.py, replace:
-    from eye_detect import detect_eyes
-    eyes = detect_eyes(image, animal["mask"], animal["bbox"])
-with:
-    from keypoint_model.predict import load_pose_model, detect_eyes_pose
+Usage in main.py:
+    from eye_keypoint_model.predict import load_pose_model, detect_eyes_pose
     pose_model = load_pose_model()          # once, outside the loop
     eyes = detect_eyes_pose(pose_model, image, animal["bbox"])
-
-The returned EyePair is identical in interface to the HoughCircles version,
-so no other changes are needed.
 """
 
 import os
@@ -36,7 +25,7 @@ KP_LEFT_EYE  = 0
 KP_RIGHT_EYE = 1
 
 DEFAULT_MODEL_PATH = os.getenv("EYE_MODEL_PATH",
-                                "runs/keypoint/animal_eyes_v1/weights/best.pt")
+                                "runs/pose/runs/keypoint/animal_eyes_v13/weights/best.pt")
 
 
 @dataclass
@@ -99,6 +88,7 @@ def detect_eyes_pose(
     rx2, ry2 = min(w, x2 + pad), min(h, y2 + pad)
 
     roi = image[ry1:ry2, rx1:rx2]
+    roi = _apply_clahe(roi)
 
     results = model(roi, conf=det_conf, verbose=False)[0]
 
@@ -127,6 +117,15 @@ def detect_eyes_pose(
         conf_left=left_c,
         conf_right=right_c,
     )
+
+
+def _apply_clahe(roi: np.ndarray) -> np.ndarray:
+    """增強 ROI 局部對比度，改善深色毛色區域的眼睛可見度。"""
+    lab = cv2.cvtColor(roi, cv2.COLOR_BGR2LAB)
+    l, a, b = cv2.split(lab)
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(4, 4))
+    l = clahe.apply(l)
+    return cv2.cvtColor(cv2.merge([l, a, b]), cv2.COLOR_LAB2BGR)
 
 
 def _extract_kp(
