@@ -19,10 +19,13 @@ from pathlib import Path
 
 from ultralytics import YOLO
 
-# Default paths
-DEFAULT_DATASET = "data/ap10k_eye_keypoints/dataset.yaml"
-DEFAULT_MODEL   = "yolov8s-pose.pt"   # nano; swap to yolov8s-pose.pt for better accuracy
-DEFAULT_OUTPUT  = "runs/keypoint"
+# Project root = two levels up from this file (src/eye_keypoint_model/train.py)
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+# Default paths (absolute, independent of working directory)
+DEFAULT_DATASET = str(PROJECT_ROOT / "data/ap10k_eye_keypoints/dataset.yaml")
+DEFAULT_MODEL   = "yolov8s-pose.pt"
+DEFAULT_OUTPUT  = str(PROJECT_ROOT / "runs/keypoint")
 DEFAULT_NAME    = "animal_eyes_v1"
 
 

@@ -2,11 +2,13 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
 COCO_IMAGES_URL = "http://images.cocodataset.org/zips/val2017.zip"
 COCO_ANNOTATIONS_URL = "http://images.cocodataset.org/annotations/annotations_trainval2017.zip"
 
 
-def download_coco(data_dir: str = "data/coco") -> dict:
+def download_coco(data_dir: str = str(PROJECT_ROOT / "data/coco")) -> dict:
     """
     Download COCO val2017 images and annotations if not present.
 

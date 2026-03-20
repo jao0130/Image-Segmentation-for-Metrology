@@ -2,17 +2,23 @@ version: "3.9"
 
 services:
   pipeline:
-    build: .
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     volumes:
-      - ./data:/app/data
-      - ./output:/app/output
+      - ../data:/app/data
+      - ../output:/app/output
+      - ../weights:/app/weights
     environment:
-      - DATA_DIR=data/coco
-      - OUTPUT_DIR=output
+      - DATA_DIR=/app/data/coco
+      - OUTPUT_DIR=/app/output
+      - EYE_MODEL_PATH=/app/weights/best.pt
       - SAMPLE_COUNT=20
       - RANDOM_SEED=42
     deploy:
       resources:
         reservations:
           devices:
-            - capabilities: [gpu]
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

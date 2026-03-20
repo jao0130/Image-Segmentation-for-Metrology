@@ -106,3 +106,26 @@ d = sqrt((x_A_right - x_B_right)² + (y_A_right - y_B_right)²)
 - 訓練資料：AP-10K（17 keypoints，僅保留 left_eye、right_eye）
 - 推論前套用 CLAHE 增強，改善深色毛色動物的眼睛偵測準確度
 - 評估指標：Pose mAP@0.5（OKS）
+
+## 資料來源與引用
+
+### 資料集
+
+**COCO (Common Objects in Context)**
+- 用途：影像來源，篩選含 2 隻以上動物的圖片
+- 官網：https://cocodataset.org
+- 論文：Lin et al., "Microsoft COCO: Common Objects in Context", ECCV 2014
+- 授權：Creative Commons Attribution 4.0 License
+
+**AP-10K (Animal Pose Dataset)**
+- 用途：眼睛 keypoint 模型訓練資料
+- 官網：https://github.com/AlexTheBad/AP-10K
+- 論文：Hang et al., "AP-10K: A Benchmark for Animal Pose Estimation in the Wild", NeurIPS 2021
+- 授權：CC BY-NC 4.0 License
+
+### 模型
+
+**YOLOv8 (Ultralytics)**
+- 用途：Instance segmentation（yolov8n-seg）與 Pose estimation（yolov8s-pose）
+- 官網：https://github.com/ultralytics/ultralytics
+- 授權：AGPL-3.0 License

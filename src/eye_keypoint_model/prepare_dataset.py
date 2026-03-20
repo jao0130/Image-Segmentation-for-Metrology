@@ -30,6 +30,8 @@ import json
 import shutil
 from pathlib import Path
 
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
 # Indices of the two eye keypoints within AP-10K's 17-kp schema
 EYE_KP_INDICES = [0, 1]   # left_eye, right_eye
 
@@ -38,8 +40,8 @@ MIN_EYE_VISIBILITY = 1
 
 
 def prepare_dataset(
-    ap10k_dir: str = "data/ap10k",
-    output_dir: str = "data/ap10k_eye_keypoints",
+    ap10k_dir: str = str(PROJECT_ROOT / "data/ap10k"),
+    output_dir: str = str(PROJECT_ROOT / "data/ap10k_eye_keypoints"),
 ) -> str | None:
     """
     Convert AP-10K COCO-format annotations to YOLOv8 pose format.

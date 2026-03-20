@@ -10,7 +10,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Allow `python src/main.py` from project root
+# Project root and src path (independent of working directory)
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).parent))
 
 from download_coco import download_coco
@@ -20,8 +21,8 @@ from measure import inter_eye_distance, right_eye_distance
 from segment import load_model, segment_animals
 from visualize import draw_results
 
-DATA_DIR = os.getenv("DATA_DIR", "data/coco")
-OUTPUT_DIR = os.getenv("OUTPUT_DIR", "output")
+DATA_DIR = os.getenv("DATA_DIR", str(PROJECT_ROOT / "data/coco"))
+OUTPUT_DIR = os.getenv("OUTPUT_DIR", str(PROJECT_ROOT / "output"))
 SAMPLE_COUNT = int(os.getenv("SAMPLE_COUNT", "100"))
 RANDOM_SEED = int(os.getenv("RANDOM_SEED", "42"))
 
