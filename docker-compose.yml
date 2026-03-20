@@ -10,6 +10,7 @@ services:
       - DATA_DIR=data/coco
       - OUTPUT_DIR=output
       - SAMPLE_COUNT=20
+      - RANDOM_SEED=42
     deploy:
       resources:
         reservations:

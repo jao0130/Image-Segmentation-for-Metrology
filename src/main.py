@@ -32,7 +32,7 @@ def run():
     images_dir = paths["images_dir"]
 
     # 2. Filter images with 2+ animals
-    with open(paths["annotations_path"]) as f:
+    with open(paths["annotations_path"], encoding="utf-8") as f:
         annotations = json.load(f)
 
     valid_ids = get_images_with_multiple_animals(annotations)
