@@ -24,8 +24,7 @@ from ultralytics import YOLO
 KP_LEFT_EYE  = 0
 KP_RIGHT_EYE = 1
 
-DEFAULT_MODEL_PATH = os.getenv("EYE_MODEL_PATH",
-                                "runs/pose/runs/keypoint/animal_eyes_v13/weights/best.pt")
+DEFAULT_MODEL_PATH = os.getenv("EYE_MODEL_PATH", "weights/best.pt")
 
 
 @dataclass

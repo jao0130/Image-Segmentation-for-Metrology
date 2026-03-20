@@ -1,6 +1,7 @@
 output/
 data/
 *.pt
+!weights/*.pt
 __pycache__/
 .pytest_cache/
 .env
