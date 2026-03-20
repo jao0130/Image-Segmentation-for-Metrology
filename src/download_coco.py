@@ -41,5 +41,7 @@ def _download_and_extract(url: str, dest: Path):
 
 
 def _progress(blocks, block_size, total):
+    if total <= 0:
+        return
     pct = min(blocks * block_size / total * 100, 100)
     print(f"\r  {pct:.1f}%", end="", flush=True)

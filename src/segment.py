@@ -2,7 +2,8 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 
-# YOLOv8 COCO80 class IDs for animals (0-indexed)
+# YOLOv8 COCO80 class IDs (0-indexed): bird=14, cat=15, dog=16, horse=17, sheep=18,
+# cow=19, elephant=20, bear=21, zebra=22, giraffe=23
 ANIMAL_CLASS_IDS = {14, 15, 16, 17, 18, 19, 20, 21, 22, 23}
 
 
@@ -38,6 +39,7 @@ def segment_animals(model: YOLO, image_path: str, conf: float = 0.25) -> list:
             continue
 
         x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())
+        # results.masks.data[i] corresponds to results.boxes[i] per ultralytics API contract
         mask_raw = results.masks.data[i].cpu().numpy()
         mask = cv2.resize(mask_raw, (orig_w, orig_h),
                           interpolation=cv2.INTER_NEAREST).astype(np.uint8)

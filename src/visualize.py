@@ -1,6 +1,5 @@
 from pathlib import Path
 import cv2
-import numpy as np
 
 PALETTE = [
     (0, 255, 0), (0, 0, 255), (255, 165, 0), (255, 0, 255),
@@ -19,6 +18,8 @@ def draw_results(image_path: str, animals: list, output_path: str):
     Saves to output_path.
     """
     img = cv2.imread(image_path)
+    if img is None:
+        raise ValueError(f"Cannot read image: {image_path}")
     overlay = img.copy()
 
     # Draw masks
