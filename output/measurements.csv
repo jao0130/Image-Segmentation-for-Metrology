@@ -1,0 +1,13 @@
+image_id,type,animal_a,animal_b,class_a,class_b,left_eye_x,left_eye_y,right_eye_x,right_eye_y,distance_px,eye_method
+20247,cross_animal_right_eye,0,1.0,bear,bear,,,,,408.88,
+20247,inter_eye,0,,bear,,14.0,93.0,26.0,97.0,12.65,hough
+20247,inter_eye,1,,bear,,392.0,262.0,414.0,226.0,42.19,hough
+165336,cross_animal_right_eye,0,1.0,giraffe,giraffe,,,,,133.18,
+165336,inter_eye,0,,giraffe,,380.0,294.0,414.0,294.0,34.0,hough
+165336,inter_eye,1,,giraffe,,273.0,257.0,281.0,301.0,44.72,hough
+7281,cross_animal_right_eye,0,1.0,horse,horse,,,,,125.54,
+7281,inter_eye,0,,horse,,377.0,221.0,401.0,249.0,36.88,hough
+7281,inter_eye,1,,horse,,508.0,271.0,520.0,209.0,63.15,hough
+187236,cross_animal_right_eye,0,1.0,cat,cat,,,,,476.94,
+187236,inter_eye,0,,cat,,75.0,370.0,121.0,368.0,46.04,fallback
+187236,inter_eye,1,,cat,,470.0,119.0,541.0,142.0,74.63,fallback
