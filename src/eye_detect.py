@@ -1,13 +1,14 @@
 from dataclasses import dataclass
+from typing import Optional
 import cv2
 import numpy as np
 
 
 @dataclass
 class EyePair:
-    left: tuple   # (x, y) in original image coords, or None
-    right: tuple  # (x, y) in original image coords, or None
-    method: str   # "hough" or "fallback"
+    left: Optional[tuple]   # (x, y) in original image coords, or None
+    right: Optional[tuple]  # (x, y) in original image coords, or None
+    method: str             # "hough" or "fallback"
 
 
 def detect_eyes(image: np.ndarray, mask: np.ndarray, bbox: tuple) -> EyePair:
@@ -25,6 +26,10 @@ def detect_eyes(image: np.ndarray, mask: np.ndarray, bbox: tuple) -> EyePair:
     x1, y1, x2, y2 = bbox
     h = max(y2 - y1, 1)
     w = max(x2 - x1, 1)
+
+    # Guard against degenerate bbox
+    if x2 <= x1 or y2 <= y1:
+        return EyePair(left=None, right=None, method="fallback")
 
     # Crop ROI and mask
     roi = image[y1:y2, x1:x2].copy()
@@ -63,8 +68,8 @@ def detect_eyes(image: np.ndarray, mask: np.ndarray, bbox: tuple) -> EyePair:
         if len(valid) >= 2:
             pts = sorted(valid[:2], key=lambda c: c[0])
             return EyePair(
-                left=(x1 + pts[0][0], y1 + pts[0][1]),
-                right=(x1 + pts[1][0], y1 + pts[1][1]),
+                left=(int(x1 + pts[0][0]), int(y1 + pts[0][1])),
+                right=(int(x1 + pts[1][0]), int(y1 + pts[1][1])),
                 method="hough",
             )
 
@@ -81,8 +86,6 @@ def _fallback_eyes(gray: np.ndarray, mask_head: np.ndarray,
     candidates = []
     for idx in sorted_idx:
         py, px = divmod(int(idx), w)
-        if py >= head_h:
-            continue
         if not candidates or min(abs(px - c[0]) for c in candidates) > w * 0.1:
             candidates.append((px, py))
         if len(candidates) == 2:
