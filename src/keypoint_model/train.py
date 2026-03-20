@@ -1,0 +1,130 @@
+"""
+Train YOLOv8-pose for animal eye keypoint detection.
+
+Trains a YOLOv8-pose model on the AP-10K dataset (converted by prepare_dataset.py)
+to predict left_eye and right_eye keypoints on animals.
+
+Hardware recommendation (matches project specs):
+    RTX 4060 Ti 16GB  →  batch=16, imgsz=640, model=yolov8n-pose or yolov8s-pose
+
+Usage:
+    python src/keypoint_model/train.py
+
+    # Custom settings:
+    python src/keypoint_model/train.py --epochs 200 --model yolov8s-pose.pt --batch 8
+"""
+
+import argparse
+from pathlib import Path
+
+from ultralytics import YOLO
+
+# Default paths
+DEFAULT_DATASET = "data/animal_keypoints/dataset.yaml"
+DEFAULT_MODEL   = "yolov8n-pose.pt"   # nano; swap to yolov8s-pose.pt for better accuracy
+DEFAULT_OUTPUT  = "runs/keypoint"
+DEFAULT_NAME    = "animal_eyes_v1"
+
+
+def train(
+    dataset: str   = DEFAULT_DATASET,
+    base_model: str = DEFAULT_MODEL,
+    epochs: int    = 100,
+    imgsz: int     = 640,
+    batch: int     = 16,
+    device: str    = "0",        # "0" = first GPU; "cpu" = CPU
+    project: str   = DEFAULT_OUTPUT,
+    name: str      = DEFAULT_NAME,
+    resume: bool   = False,
+) -> str:
+    """
+    Fine-tune YOLOv8-pose on animal eye keypoints.
+
+    Returns path to best weights file.
+    """
+    if not Path(dataset).exists():
+        raise FileNotFoundError(
+            f"Dataset not found: {dataset}\n"
+            "Run `python src/keypoint_model/prepare_dataset.py` first."
+        )
+
+    model = YOLO(base_model)
+
+    model.train(
+        data=dataset,
+        epochs=epochs,
+        imgsz=imgsz,
+        batch=batch,
+        device=device,
+        project=project,
+        name=name,
+        resume=resume,
+
+        # ── Loss weights ──────────────────────────────────────────────────
+        # pose  : keypoint regression loss weight (increase for better eye loc)
+        # kobj  : keypoint objectness loss weight
+        pose=12.0,
+        kobj=2.0,
+
+        # ── Augmentation ──────────────────────────────────────────────────
+        # Horizontal flip is fine for eyes (left/right are symmetric)
+        fliplr=0.5,
+        # Do NOT flip vertically — eyes are always in upper region
+        flipud=0.0,
+        # Colour jitter — helps generalise across animal fur colours
+        hsv_h=0.015,
+        hsv_s=0.7,
+        hsv_v=0.4,
+        # Mosaic and mixup improve small object detection
+        mosaic=1.0,
+        mixup=0.1,
+
+        # ── Training control ──────────────────────────────────────────────
+        # Stop early if no improvement for 30 epochs
+        patience=30,
+        # Save checkpoint every N epochs
+        save_period=10,
+        # Workers: 80% of 12 threads = ~9, capped at 8 for safety
+        workers=8,
+
+        verbose=True,
+    )
+
+    best = Path(project) / name / "weights" / "best.pt"
+    print(f"\nTraining complete.")
+    print(f"Best weights : {best}")
+    print(f"Usage        : set EYE_MODEL_PATH={best} in .env")
+    return str(best)
+
+
+def parse_args():
+    p = argparse.ArgumentParser(description="Train animal eye keypoint model")
+    p.add_argument("--dataset",   default=DEFAULT_DATASET)
+    p.add_argument("--model",     default=DEFAULT_MODEL,
+                   help="Base weights (yolov8n-pose.pt / yolov8s-pose.pt / yolov8m-pose.pt)")
+    p.add_argument("--epochs",    type=int, default=100)
+    p.add_argument("--imgsz",     type=int, default=640)
+    p.add_argument("--batch",     type=int, default=16,
+                   help="Reduce to 8 if GPU OOM")
+    p.add_argument("--device",    default="0",
+                   help="GPU index or 'cpu'")
+    p.add_argument("--project",   default=DEFAULT_OUTPUT)
+    p.add_argument("--name",      default=DEFAULT_NAME)
+    p.add_argument("--resume",    action="store_true",
+                   help="Resume from last checkpoint")
+    return p.parse_args()
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    train(
+        dataset=args.dataset,
+        base_model=args.model,
+        epochs=args.epochs,
+        imgsz=args.imgsz,
+        batch=args.batch,
+        device=args.device,
+        project=args.project,
+        name=args.name,
+        resume=args.resume,
+    )
