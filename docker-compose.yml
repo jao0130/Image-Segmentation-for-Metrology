@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  pipeline:
+    build: .
+    volumes:
+      - ./data:/app/data
+      - ./output:/app/output
+    environment:
+      - DATA_DIR=data/coco
+      - OUTPUT_DIR=output
+      - SAMPLE_COUNT=20
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
