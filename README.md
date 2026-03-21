@@ -96,6 +96,11 @@ d = sqrt((x_A_right - x_B_right)² + (y_A_right - y_B_right)²)
 
 所有量測單位為 **像素（pixel）**。
 
+# Example
+![imgae]()
+![imgae]()
+![imgae]()
+
 ## AI 模型說明
 
 **分割模型：** `yolov8n-seg.pt`
