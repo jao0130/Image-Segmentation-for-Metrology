@@ -36,17 +36,20 @@ def _th(img):
 
 
 def _put_text_with_bg(img, text, pos, font_scale, color, thickness=None, padding=None):
-    """Draw text with a dark background box for readability."""
+    """Draw text with a semi-transparent dark background box for readability."""
     if thickness is None:
         thickness = _th(img)
     if padding is None:
         padding = max(3, int(_scale(img, 4)))
     (tw, th), baseline = cv2.getTextSize(text, FONT, font_scale, thickness)
     x, y = pos
-    cv2.rectangle(img,
-                  (x - padding, y - th - padding),
-                  (x + tw + padding, y + baseline + padding),
-                  COLOR_TEXT_BG, -1)
+    rx1 = max(0, x - padding)
+    ry1 = max(0, y - th - padding)
+    rx2 = min(img.shape[1] - 1, x + tw + padding)
+    ry2 = min(img.shape[0] - 1, y + baseline + padding)
+    overlay = img.copy()
+    cv2.rectangle(overlay, (rx1, ry1), (rx2, ry2), COLOR_TEXT_BG, -1)
+    cv2.addWeighted(overlay, 0.55, img, 0.45, 0, img)
     cv2.putText(img, text, (x, y), FONT, font_scale, color, thickness, cv2.LINE_AA)
 
 

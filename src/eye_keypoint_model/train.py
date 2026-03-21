@@ -111,21 +111,30 @@ def train(
         # ── Loss weights ──────────────────────────────────────────────────
         # pose  : keypoint regression loss weight (increase for better eye loc)
         # kobj  : keypoint objectness loss weight
-        pose=6.0,
-        kobj=1.5,
+        pose=10.0,
+        kobj=2.0,
 
         # ── Augmentation ──────────────────────────────────────────────────
         # Horizontal flip is fine for eyes (left/right are symmetric)
         fliplr=0.5,
         # Do NOT flip vertically — eyes are always in upper region
         flipud=0.0,
+        # Rotation: animals can be lying down or tilted
+        degrees=25.0,
+        # Scale variation: eyes occupy very different fractions of the bbox
+        scale=0.6,
+        # Translation: eye is not always centred in the bbox
+        translate=0.15,
+        # Perspective: accounts for different shooting angles
+        perspective=0.0003,
         # Colour jitter — helps generalise across animal fur colours
         hsv_h=0.015,
         hsv_s=0.7,
         hsv_v=0.4,
-        # Mosaic and mixup improve small object detection
-        mosaic=1.0,
+        # Mosaic and copy_paste improve small-object generalisation
+        mosaic=0.8,
         mixup=0.1,
+        copy_paste=0.3,
 
         # ── Training control ──────────────────────────────────────────────
         # Stop early if no improvement for 30 epochs
@@ -133,7 +142,7 @@ def train(
         # Save checkpoint every N epochs
         save_period=10,
         # Workers: 80% of 12 threads = ~9, capped at 8 for safety
-        workers=8,
+        workers=4,
 
         verbose=False,
     )

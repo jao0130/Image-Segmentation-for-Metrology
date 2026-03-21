@@ -39,7 +39,13 @@ class EyePair:
 def _resolve_model_path() -> str:
     """Resolve model path at call time so .env values are available."""
     raw = os.getenv("EYE_MODEL_PATH", "weights/best.pt")
-    return raw if Path(raw).is_absolute() else str(PROJECT_ROOT / raw)
+    p = Path(raw)
+    # On Windows, paths like /foo or \foo are "absolute" but have no drive letter;
+    # they resolve relative to the current drive root, not the project.
+    # Only treat as truly absolute when a drive letter is present (e.g. D:\...).
+    if p.is_absolute() and p.drive:
+        return str(p)
+    return str(PROJECT_ROOT / raw.lstrip("/\\"))
 
 
 def load_pose_model(model_path: str = None) -> YOLO:

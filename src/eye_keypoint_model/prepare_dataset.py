@@ -30,6 +30,9 @@ import json
 import shutil
 from pathlib import Path
 
+import cv2
+import numpy as np
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 # Indices of the two eye keypoints within AP-10K's 17-kp schema
@@ -137,12 +140,16 @@ def _convert_split(
         if not lines:
             continue
 
-        # Copy image
+        # Copy image with CLAHE — matches inference preprocessing in predict.py
         src = img_dir / img_file
         dst = out_img / img_file
         if src.exists() and not dst.exists():
             dst.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, dst)
+            img = cv2.imread(str(src))
+            if img is not None:
+                cv2.imwrite(str(dst), _clahe(img))
+            else:
+                shutil.copy2(src, dst)
 
         lbl_path = out_lbl / (Path(img_file).stem + ".txt")
         lbl_path.write_text("\n".join(lines), encoding="utf-8")
@@ -168,6 +175,14 @@ names:
     yaml_path = out / "dataset.yaml"
     yaml_path.write_text(content, encoding="utf-8")
     return yaml_path
+
+
+def _clahe(img: np.ndarray) -> np.ndarray:
+    """Apply CLAHE on the L channel (LAB) — matches predict.py inference."""
+    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+    l, a, b = cv2.split(lab)
+    l = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(4, 4)).apply(l)
+    return cv2.cvtColor(cv2.merge([l, a, b]), cv2.COLOR_LAB2BGR)
 
 
 if __name__ == "__main__":
