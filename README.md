@@ -1,4 +1,14 @@
 # Animal Metrology Pipeline
+## 技術棧
+## 專案結構
+## 本地運行
+## Docker 部署
+## 系統架構
+## 量測公式
+## 模型說明
+## 資料來源與引用
+
+# Animal Metrology Pipeline
 
 使用 YOLOv8-seg 對 COCO 資料集進行動物分割，並以自訓練 YOLOv8-pose 模型量測雙眼距離與跨動物右眼距離。
 
@@ -101,7 +111,7 @@ d = sqrt((x_A_right - x_B_right)² + (y_A_right - y_B_right)²)
 ![imgae]()
 ![imgae]()
 
-## AI 模型說明
+## 模型說明
 
 **分割模型：** `yolov8n-seg.pt`
 - 預訓練於 COCO80，支援 10 種動物類別（bird、cat、dog、horse、sheep、cow、elephant、bear、zebra、giraffe）
