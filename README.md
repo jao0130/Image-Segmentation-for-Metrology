@@ -81,7 +81,7 @@ python src/eye_keypoint_model/train.py
 cp runs/keypoint/animal_eyes_v1/weights/best.pt weights/best.pt
 ```
 
-## Docker 部署
+## Docker部署
 
 ```bash
 cd docker
