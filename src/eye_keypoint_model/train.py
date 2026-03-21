@@ -15,9 +15,50 @@ Usage:
 """
 
 import argparse
+import shutil
 from pathlib import Path
 
+from tqdm import tqdm
 from ultralytics import YOLO
+
+# ── Compact progress display ───────────────────────────────────────────────────
+
+_pbar: tqdm | None = None
+_total_epochs = 0
+
+
+def _on_train_start(trainer):
+    global _pbar, _total_epochs
+    _total_epochs = trainer.epochs
+    cols = max(shutil.get_terminal_size().columns - 2, 40)
+    _pbar = tqdm(total=_total_epochs, ncols=cols,
+                 bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]",
+                 desc="Training", colour="cyan")
+
+
+def _on_train_epoch_end(trainer):
+    if _pbar is None:
+        return
+    m = trainer.metrics
+    cols     = max(shutil.get_terminal_size().columns - 2, 40)
+    _pbar.ncols = cols
+
+    box_loss  = getattr(trainer.loss_items, 'tolist', lambda: [0]*4)()
+    pose_loss = box_loss[3] if len(box_loss) > 3 else 0.0
+    map50p    = m.get("metrics/mAP50(P)", 0.0)
+    map50b    = m.get("metrics/mAP50(B)", 0.0)
+
+    _pbar.set_postfix({
+        "pose_loss": f"{pose_loss:.3f}",
+        "mAP50(P)":  f"{map50p:.3f}",
+        "mAP50(B)":  f"{map50b:.3f}",
+    }, refresh=False)
+    _pbar.update(1)
+
+
+def _on_train_end(trainer):
+    if _pbar is not None:
+        _pbar.close()
 
 # Project root = two levels up from this file (src/eye_keypoint_model/train.py)
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -26,7 +67,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_DATASET = str(PROJECT_ROOT / "data/ap10k_eye_keypoints/dataset.yaml")
 DEFAULT_MODEL   = "yolov8s-pose.pt"
 DEFAULT_OUTPUT  = str(PROJECT_ROOT / "runs/keypoint")
-DEFAULT_NAME    = "animal_eyes_v1"
+DEFAULT_NAME    = "animal_eyes_"
 
 
 def train(
@@ -52,6 +93,10 @@ def train(
         )
 
     model = YOLO(base_model)
+
+    model.add_callback("on_train_start",     _on_train_start)
+    model.add_callback("on_train_epoch_end", _on_train_epoch_end)
+    model.add_callback("on_train_end",       _on_train_end)
 
     model.train(
         data=dataset,
@@ -90,7 +135,7 @@ def train(
         # Workers: 80% of 12 threads = ~9, capped at 8 for safety
         workers=8,
 
-        verbose=True,
+        verbose=False,
     )
 
     best = Path(project) / name / "weights" / "best.pt"

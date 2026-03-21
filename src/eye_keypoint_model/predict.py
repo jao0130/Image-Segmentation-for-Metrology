@@ -24,7 +24,7 @@ from ultralytics import YOLO
 KP_LEFT_EYE  = 0
 KP_RIGHT_EYE = 1
 
-DEFAULT_MODEL_PATH = os.getenv("EYE_MODEL_PATH", "weights/best.pt")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 @dataclass
@@ -36,13 +36,21 @@ class EyePair:
     conf_right: float = field(default=0.0)
 
 
-def load_pose_model(model_path: str = DEFAULT_MODEL_PATH) -> YOLO:
+def _resolve_model_path() -> str:
+    """Resolve model path at call time so .env values are available."""
+    raw = os.getenv("EYE_MODEL_PATH", "weights/best.pt")
+    return raw if Path(raw).is_absolute() else str(PROJECT_ROOT / raw)
+
+
+def load_pose_model(model_path: str = None) -> YOLO:
     """
     Load the trained YOLOv8-pose model.
 
     Raises FileNotFoundError with a clear message if the weights are missing
     so the user knows to train first.
     """
+    if model_path is None:
+        model_path = _resolve_model_path()
     if not Path(model_path).exists():
         raise FileNotFoundError(
             f"Pose model not found: {model_path}\n\n"

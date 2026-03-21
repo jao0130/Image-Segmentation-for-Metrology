@@ -8,11 +8,11 @@ import cv2
 import pandas as pd
 from dotenv import load_dotenv
 
-load_dotenv()
-
 # Project root and src path (independent of working directory)
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).parent))
+
+load_dotenv(PROJECT_ROOT / ".env")
 
 from download_coco import download_coco
 from eye_keypoint_model.predict import load_pose_model, detect_eyes_pose

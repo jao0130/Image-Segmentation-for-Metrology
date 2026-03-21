@@ -33,7 +33,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 # Indices of the two eye keypoints within AP-10K's 17-kp schema
-EYE_KP_INDICES = [0, 1]   # left_eye, right_eye
+EYE_KP_INDICES = [0, 1, 2]   # left_eye, right_eye, nose
 
 # Minimum eye visibility: at least one eye must be visible (v=2) or labelled (v=1)
 MIN_EYE_VISIBILITY = 1
@@ -159,8 +159,8 @@ train: images/train
 val:   images/val
 
 # 2 keypoints: [left_eye, right_eye]
-kpt_shape: [2, 3]   # [num_keypoints, (x, y, visibility)]
-flip_idx: [1, 0]    # horizontal flip: left_eye <-> right_eye
+kpt_shape: [3, 3]   # [num_keypoints, (x, y, visibility)]
+flip_idx: [1, 0, 2]    # horizontal flip: left_eye <-> right_eye
 
 names:
   0: animal
